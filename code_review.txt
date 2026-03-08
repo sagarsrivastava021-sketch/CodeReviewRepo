@@ -1,0 +1,43 @@
+# Code Review: InsertionSort.cs
+
+## 1. Code Quality and Best Practices
+- **Encapsulation**: The `InsertionSort` method is currently static and resides within the `Program` class. For better maintainability and reusability, this should be moved to a dedicated utility class (e.g., `SortingAlgorithms`) with an appropriate namespace.
+- **Generics**: The current implementation only supports `int[]`. To adhere to modern .NET best practices, this should be refactored to use Generics (`T[]`) with a constraint of `IComparable<T>` or by accepting an `IComparer<T>`. This would allow the algorithm to sort any comparable type.
+
+## 2. Potential Bugs and Security Issues
+- **Null Reference Exception**: The method does not check if the input array `arr` is null. Calling `arr.Length` on a null array will throw a `NullReferenceException`.
+- **Input Validation**: While not a security vulnerability in this context, adding defensive programming practices (like checking for null or empty arrays) is standard for production-grade code.
+
+## 3. Performance Improvements
+- **Algorithm Complexity**: Insertion sort has an O(n²) time complexity. While this is acceptable for small datasets, it is inefficient for large collections. If this is intended for production use with large datasets, consider implementing or using `Array.Sort()` (which uses Introsort) or QuickSort/MergeSort.
+
+## 4. Code Readability and Maintainability
+- **Naming**: The method name is clear, but the class structure is too monolithic.
+- **Documentation**: The code lacks XML documentation comments (`/// <summary>...`). Adding these would improve developer experience by providing IntelliSense support.
+
+## Suggested Refactoring
+```csharp
+public static class SortingUtility
+{
+    /// <summary>
+    /// Sorts an array using the Insertion Sort algorithm.
+    /// </summary>
+    public static void InsertionSort<T>(T[] array) where T : IComparable<T>
+    {
+        if (array == null) throw new ArgumentNullException(nameof(array));
+        
+        for (int i = 1; i < array.Length; i++)
+        {
+            T key = array[i];
+            int j = i - 1;
+
+            while (j >= 0 && array[j].CompareTo(key) > 0)
+            {
+                array[j + 1] = array[j];
+                j--;
+            }
+            array[j + 1] = key;
+        }
+    }
+}
+```
