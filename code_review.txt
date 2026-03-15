@@ -1,0 +1,53 @@
+# Code Review: InsertionSort.cs
+**Date and Time:** 2023-10-27 10:00 AM UTC
+**Owner:** Senior Developer
+
+## 1. Code Quality and Best Practices
+*   **Namespace Usage:** The code lacks a namespace. In a professional .NET project, all classes should be wrapped in a proper namespace to avoid naming collisions.
+*   **Encapsulation:** The `InsertionSort` method is currently `static` within the `Program` class. It would be better practice to move this into a dedicated utility or service class (e.g., `SortingService`) to adhere to the Single Responsibility Principle.
+*   **Access Modifiers:** The method should be explicitly marked as `public` or `internal` depending on the intended scope.
+
+## 2. Potential Bugs or Security Issues
+*   **Null Reference Exception:** The method does not check if the input array `arr` is null. Calling `arr.Length` on a null reference will throw a `NullReferenceException`.
+*   **Input Validation:** There is no validation for empty arrays or arrays with a single element. While the current logic handles these gracefully, adding an explicit guard clause improves robustness.
+
+## 3. Performance Improvements
+*   **Generics:** The current implementation is limited to `int[]`. To make this utility reusable, consider using Generics with a constraint: `public static void InsertionSort<T>(T[] arr) where T : IComparable<T>`. This allows the method to sort any comparable type.
+*   **Algorithm Complexity:** Insertion sort has a time complexity of O(n²), which is inefficient for large datasets. While acceptable for small lists or nearly sorted data, for production applications involving large datasets, consider using `Array.Sort()` (which uses Introspective Sort) or implementing QuickSort/MergeSort.
+
+## 4. Code Readability and Maintainability
+*   **Documentation:** The method lacks XML documentation comments (`/// <summary>`). Adding these will help other developers understand the purpose, parameters, and behavior of the method.
+*   **Naming:** The variable names (`arr`, `i`, `j`, `key`) are standard for algorithm implementations, but in a business context, more descriptive names are preferred if the context warrants it.
+
+## Suggested Refactoring
+```csharp
+using System;
+
+namespace SortingAlgorithms
+{
+    public static class SortUtility
+    {
+        /// <summary>
+        /// Sorts an array of comparable elements using the Insertion Sort algorithm.
+        /// </summary>
+        public static void InsertionSort<T>(T[] arr) where T : IComparable<T>
+        {
+            if (arr == null) throw new ArgumentNullException(nameof(arr));
+            if (arr.Length <= 1) return;
+
+            for (int i = 1; i < arr.Length; i++)
+            {
+                T key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j].CompareTo(key) > 0)
+                {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+        }
+    }
+}
+```
