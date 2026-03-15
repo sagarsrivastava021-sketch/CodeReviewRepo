@@ -144,4 +144,53 @@ namespace SortingLibrary
         }
     }
 }
+```# Code Review: InsertionSort.cs
+**Date and Time:** 2023-10-27 10:00 AM
+**Owner:** Senior .NET Developer
+
+## 1. Code Quality and Best Practices
+*   **Namespace Usage:** The code lacks a namespace. In a professional .NET project, all classes should be wrapped in a namespace to avoid naming conflicts and improve organizational structure.
+*   **Access Modifiers:** The `InsertionSort` method and `Main` method are implicitly `private`. Explicitly defining access modifiers (e.g., `public static void`) is preferred for clarity.
+*   **Encapsulation:** The sorting logic is tightly coupled with the `Program` class. It would be better to place the algorithm in a dedicated `SortingUtility` or `Algorithms` class to promote modularity and reusability.
+
+## 2. Potential Bugs or Security Issues
+*   **Null Reference Exception:** The `InsertionSort` method does not check if the input array `arr` is null. Passing a null array will cause a `NullReferenceException`.
+*   **Input Validation:** While the algorithm works for integers, it is not robust against edge cases.
+
+## 3. Performance Improvements
+*   **Time Complexity:** Insertion sort has a time complexity of O(n²), which is acceptable for small datasets but inefficient for large arrays. Consider implementing QuickSort or MergeSort for better performance (O(n log n)) if the dataset size is expected to grow.
+*   **Memory Efficiency:** The current implementation sorts in-place, which is good for memory usage.
+
+## 4. Code Readability and Maintainability
+*   **Generics:** The method is currently limited to `int[]`. To make this code production-ready and follow SOLID principles (specifically the Open/Closed Principle), the method should be refactored to use Generics (`T[]`) and implement `IComparable<T>` or accept an `IComparer<T>`.
+*   **Documentation:** There are no XML comments (documentation tags) explaining the parameters or the behavior of the method.
+
+## Suggested Refactoring
+```csharp
+namespace SortingAlgorithms
+{
+    public static class SortingUtility
+    {
+        /// <summary>
+        /// Sorts an array using the Insertion Sort algorithm.
+        /// </summary>
+        public static void InsertionSort<T>(T[] arr) where T : IComparable<T>
+        {
+            if (arr == null) throw new ArgumentNullException(nameof(arr));
+            
+            for (int i = 1; i < arr.Length; i++)
+            {
+                T key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j].CompareTo(key) > 0)
+                {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+        }
+    }
+}
 ```
