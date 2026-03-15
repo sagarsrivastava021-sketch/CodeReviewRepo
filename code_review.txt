@@ -50,4 +50,59 @@ namespace SortingAlgorithms
         }
     }
 }
+```# Code Review: InsertionSort.cs
+
+**Date and Time Created:** 2023-10-27 10:00:00 UTC
+**Owner:** Senior Developer (AI Mentor)
+
+---
+
+## 1. Code Quality and Best Practices
+- **Encapsulation:** The `InsertionSort` method and `Main` method are currently inside a single `Program` class. For better modularity, the sorting algorithm should be moved to a dedicated service or utility class (e.g., `SortingAlgorithms.cs`) to allow for unit testing and reusability.
+- **Naming Conventions:** The code follows standard C# naming conventions.
+- **SOLID Principles:** The current implementation is procedural. To adhere to SOLID, specifically the Open/Closed Principle, consider using an interface (e.g., `ISorter`) if you plan to implement other sorting algorithms in the future.
+
+## 2. Potential Bugs or Security Issues
+- **Input Validation:** The code lacks a null check for the input array `arr`. Passing a `null` array to the `InsertionSort` method will throw a `NullReferenceException`.
+- **Integer Overflow:** While not applicable to a simple array of integers, always consider if the data type is appropriate for the expected input size.
+
+## 3. Performance Improvements
+- **Algorithm Choice:** Insertion Sort has a time complexity of O(n²), which is inefficient for large datasets. While the implementation is correct for this algorithm, suggest using built-in methods like `Array.Sort()` (which uses Introsort) for production code, as it is highly optimized.
+- **Generics:** The method is currently restricted to `int[]`. To make this more flexible and reusable, refactor the method to use Generics (`T[]`) and implement `IComparable<T>`.
+
+## 4. Code Readability and Maintainability
+- **Documentation:** The method lacks XML documentation comments (`/// <summary>`). Adding these would improve developer experience by providing IntelliSense support.
+- **Separation of Concerns:** The `Main` method handles both data setup and output. Consider separating the logic for printing the array into a utility method.
+
+---
+
+### Suggested Refactoring Example:
+
+```csharp
+public static class SortingUtility
+{
+    /// <summary>
+    /// Sorts an array using the Insertion Sort algorithm.
+    /// </summary>
+    public static void InsertionSort<T>(T[] arr) where T : IComparable<T>
+    {
+        if (arr == null) throw new ArgumentNullException(nameof(arr));
+
+        for (int i = 1; i < arr.Length; i++)
+        {
+            T key = arr[i];
+            int j = i - 1;
+
+            while (j >= 0 && arr[j].CompareTo(key) > 0)
+            {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+}
 ```
+
+---
+**Status:** Review completed. Please address the input validation and consider refactoring to generics for better maintainability.
