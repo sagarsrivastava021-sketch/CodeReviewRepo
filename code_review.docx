@@ -194,3 +194,57 @@ namespace SortingAlgorithms
     }
 }
 ```
+# Code Review: InsertionSort.cs
+
+**Date and Time:** 2023-10-27 10:00 AM
+**Reviewer:** Senior .NET Developer
+
+---
+
+## 1. Code Quality and Best Practices
+- **Encapsulation:** The `InsertionSort` method is currently inside the `Program` class. It should be moved to a dedicated `SortingUtility` or `Algorithms` class to promote separation of concerns and reusability.
+- **SOLID Principles:** The current implementation is a procedural script. To adhere to SOLID, consider defining an `ISorter` interface. This allows for dependency injection and makes it easier to swap sorting algorithms in the future (Open/Closed Principle).
+- **Naming Conventions:** The method name `InsertionSort` is appropriate, but the class structure needs improvement.
+
+## 2. Potential Bugs or Security Issues
+- **Input Validation:** There is no check for `null` or empty arrays. Passing a `null` array will throw a `NullReferenceException`.
+- **Integer Overflow:** While not directly applicable to the sorting logic itself, if this were used in a broader context, consider the data types being sorted.
+
+## 3. Performance Improvements
+- **Generics:** The current implementation only supports `int[]`. To make this production-ready and reusable, use C# Generics (`T[]`) with a constraint of `where T : IComparable<T>`. This allows the method to sort any comparable type without code duplication.
+
+## 4. Code Readability and Maintainability
+- **Documentation:** The code lacks XML documentation comments. Adding `/// <summary>` tags would improve IDE intellisense and maintainability.
+- **Modularity:** The sorting logic is tightly coupled with the `Main` method. Separating the logic into a library project would be better for larger solutions.
+
+---
+
+## Suggested Refactored Approach
+
+```csharp
+public static class SortingUtility
+{
+    /// <summary>
+    /// Sorts an array using the Insertion Sort algorithm.
+    /// </summary>
+    public static void InsertionSort<T>(T[] array) where T : IComparable<T>
+    {
+        if (array == null) throw new ArgumentNullException(nameof(array));
+
+        for (int i = 1; i < array.Length; i++)
+        {
+            T key = array[i];
+            int j = i - 1;
+
+            while (j >= 0 && array[j].CompareTo(key) > 0)
+            {
+                array[j + 1] = array[j];
+                j--;
+            }
+            array[j + 1] = key;
+        }
+    }
+}
+```
+
+This refactored version is type-safe, handles null inputs, and is much more reusable across different parts of the application.
