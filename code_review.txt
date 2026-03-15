@@ -375,4 +375,31 @@ namespace SortingAlgorithms
 ```
 
 ---
-**Status:** Review completed. Please refactor the code to improve robustness and reusability.
+**Status:** Review completed. Please refactor the code to improve robustness and reusability.# Code Review: InsertionSort.cs
+
+**Date and Time:** 2023-10-27 10:00 AM
+**Owner:** Senior Developer
+
+## 1. Code Quality and Best Practices
+*   **Namespace Usage:** The code lacks a namespace. In a professional .NET project, all classes should be encapsulated within a namespace to avoid naming conflicts.
+*   **Class Structure:** The `InsertionSort` logic is tightly coupled with the `Program` class. It is recommended to move the sorting logic into a separate utility class (e.g., `SortingAlgorithms.cs`) to adhere to the Single Responsibility Principle.
+*   **Access Modifiers:** The `InsertionSort` method should be explicitly marked as `public` or `internal` rather than relying on the default `private` access modifier if it is intended to be used by other parts of the application.
+
+## 2. Potential Bugs or Security Issues
+*   **Null Reference Exception:** The method does not check if the input array `arr` is null. Passing a null array will cause a `NullReferenceException`.
+*   **Input Validation:** There is no validation for empty arrays or arrays with a single element. While the current logic handles these gracefully, adding an explicit guard clause improves code robustness.
+
+## 3. Performance Improvements
+*   **Generics:** The current implementation is restricted to `int[]`. To make this utility reusable, consider using Generics with a constraint on `IComparable<T>`. This allows the algorithm to sort any data type that supports comparison.
+*   **Algorithmic Complexity:** Insertion Sort has a time complexity of O(n²), which is inefficient for large datasets. While acceptable for small lists or nearly sorted data, for production-grade applications, consider implementing QuickSort or MergeSort for better performance (O(n log n)).
+
+## 4. Code Readability and Maintainability
+*   **Documentation:** The code lacks XML documentation comments (`/// <summary>`). Adding these will help other developers understand the purpose and parameters of the method via IntelliSense.
+*   **Naming Conventions:** While the variable names (`i`, `j`, `key`) are standard for sorting algorithms, using more descriptive names (e.g., `currentIndex`, `comparisonIndex`, `valueToInsert`) can improve readability for junior developers.
+
+## Summary of Recommendations
+1.  Add a namespace declaration.
+2.  Move the logic to a dedicated `SortingUtility` class.
+3.  Add a null check guard clause at the beginning of the `InsertionSort` method.
+4.  Refactor the method to use Generics (`T`) to support various data types.
+5.  Add XML documentation comments.
