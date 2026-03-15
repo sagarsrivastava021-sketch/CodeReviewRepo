@@ -421,4 +421,59 @@ public static class SortingUtility
 }
 ```
 
-**Conclusion:** The code is functional for basic use cases but needs to be made more robust (null checks) and generic to fit into a professional .NET codebase.
+**Conclusion:** The code is functional for basic use cases but needs to be made more robust (null checks) and generic to fit into a professional .NET codebase.# Code Review: InsertionSort.cs
+
+**Date and Time:** 2023-10-27 10:00 AM
+**Owner:** Senior Developer (Code Reviewer)
+
+---
+
+## 1. Code Quality and Best Practices
+- **Namespace Usage:** The code is currently in the global namespace. It is best practice to wrap your code in a meaningful namespace (e.g., `SortingAlgorithms`) to avoid naming conflicts.
+- **Class Structure:** The `Program` class contains both the algorithm implementation and the entry point. For better modularity, the `InsertionSort` logic should be moved to a separate utility class or service (e.g., `SortUtility.cs`).
+- **Access Modifiers:** The `InsertionSort` method is `private` by default (within the class). If this is intended to be a reusable utility, it should be `public` and placed in a library project.
+
+## 2. Potential Bugs or Security Issues
+- **Input Validation:** The method does not check if the input array `arr` is `null`. Passing a null array will result in a `NullReferenceException`.
+- **Integer Overflow:** While not directly applicable to a simple sort, always consider if the data type (int) is appropriate for the expected range of values.
+
+## 3. Performance Improvements
+- **Generics:** The current implementation only supports `int[]`. To make this more robust and reusable, consider using Generics with a constraint where T implements `IComparable<T>`. This would allow the method to sort arrays of strings, doubles, or custom objects.
+- **Algorithm Choice:** Insertion sort has a time complexity of O(n²). While it is efficient for small datasets, it is not suitable for large arrays. For production-grade applications, consider using built-in methods like `Array.Sort()` which uses Introspective Sort (a hybrid of QuickSort, HeapSort, and InsertionSort).
+
+## 4. Code Readability and Maintainability
+- **Documentation:** The method lacks XML documentation comments (`///`). Adding these would improve IntelliSense support and help other developers understand the method's purpose, parameters, and behavior.
+- **Naming Conventions:** The naming is clear and follows standard C# conventions.
+
+---
+
+### Suggested Refactored Code Snippet
+
+```csharp
+namespace SortingAlgorithms
+{
+    public static class SortUtility
+    {
+        /// <summary>
+        /// Sorts an array of comparable elements using the Insertion Sort algorithm.
+        /// </summary>
+        public static void InsertionSort<T>(T[] arr) where T : IComparable<T>
+        {
+            if (arr == null) throw new ArgumentNullException(nameof(arr));
+
+            for (int i = 1; i < arr.Length; i++)
+            {
+                T key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j].CompareTo(key) > 0)
+                {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+        }
+    }
+}
+```
