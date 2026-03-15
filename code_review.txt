@@ -257,4 +257,63 @@ namespace SortingAlgorithms
 ```
 
 ---
-**Status:** Review complete. Please address the null check and architectural concerns before merging.
+**Status:** Review complete. Please address the null check and architectural concerns before merging.# Code Review: InsertionSort.cs
+
+**Date and Time:** 2023-10-27 10:00 AM
+**Owner:** sagarsrivastava021-sketch
+
+---
+
+## 1. Code Quality and Best Practices
+*   **Namespace Usage:** The code is currently in the global namespace. It is best practice to wrap your code in a meaningful namespace (e.g., `SortingAlgorithms`) to avoid naming conflicts.
+*   **Encapsulation:** The `InsertionSort` method is `static` and within a `Program` class. While acceptable for a simple console app, in a real-world project, this logic should be encapsulated in a service or utility class (e.g., `SortService`) to follow the Single Responsibility Principle.
+*   **Input Validation:** The code lacks validation for the input array. If `arr` is null, the program will throw a `NullReferenceException`.
+
+## 2. Potential Bugs or Security Issues
+*   **Null Reference Exception:** As mentioned above, adding a check for `null` is essential to make the code robust.
+    *   *Suggestion:* `if (arr == null) throw new ArgumentNullException(nameof(arr));`
+
+## 3. Performance Improvements
+*   **Algorithm Complexity:** Insertion Sort has a time complexity of O(n²), which is inefficient for large datasets.
+    *   *Suggestion:* For production code dealing with large arrays, consider using built-in methods like `Array.Sort()` which typically uses Introsort (a hybrid of Quicksort, Heapsort, and Insertion Sort), offering O(n log n) performance.
+*   **Generic Support:** The current implementation only supports `int[]`. To make this utility reusable, consider using Generics with `IComparable<T>`.
+
+## 4. Code Readability and Maintainability
+*   **Documentation:** The code lacks XML documentation comments. Adding these helps other developers understand the purpose, parameters, and behavior of the method.
+*   **Naming:** The variable names (`arr`, `i`, `j`, `key`) are standard for algorithm implementations, but in a larger codebase, more descriptive names might be preferred.
+
+---
+
+## Suggested Refactored Code
+```csharp
+using System;
+
+namespace SortingAlgorithms
+{
+    public static class SortUtility
+    {
+        /// <summary>
+        /// Sorts an array of integers using the Insertion Sort algorithm.
+        /// </summary>
+        /// <param name="arr">The array to sort.</param>
+        public static void InsertionSort(int[] arr)
+        {
+            if (arr == null) throw new ArgumentNullException(nameof(arr));
+            if (arr.Length <= 1) return;
+
+            for (int i = 1; i < arr.Length; i++)
+            {
+                int key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j] > key)
+                {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+        }
+    }
+}
+```
