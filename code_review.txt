@@ -1,33 +1,45 @@
 # Code Review: InsertionSort.cs
 
 ## 1. Code Quality and Best Practices
-*   **Encapsulation:** The `InsertionSort` method and `Main` method are inside a static `Program` class. While acceptable for a small console application, in a professional .NET project, logic should be encapsulated in a service or utility class (e.g., `SortingService`) to follow the Single Responsibility Principle.
-*   **Naming Conventions:** The code follows standard C# naming conventions.
-*   **Generics:** The current implementation only supports `int[]`. To improve reusability, consider using generics with a constraint `where T : IComparable<T>`.
+- **Encapsulation:** The `InsertionSort` method and the `Main` method are inside a single class `Program`. For better maintainability and modularity, the sorting logic should be moved to a dedicated service class (e.g., `SortingService`).
+- **Access Modifiers:** The `InsertionSort` method is `static` and implicitly `private`. If this is intended to be a utility, it should be explicitly marked `public` or `internal` and placed in a library project.
+- **Naming Conventions:** The code follows standard C# naming conventions.
 
 ## 2. Potential Bugs or Security Issues
-*   **Null Reference Exception:** The method does not check if the input array `arr` is `null`. Passing a `null` array will throw a `NullReferenceException`. Added validation is recommended.
+- **Input Validation:** The code lacks input validation. If `arr` is `null`, the program will throw a `NullReferenceException`.
+    - *Suggestion:* Add a null check at the beginning of the method: `if (arr == null) throw new ArgumentNullException(nameof(arr));`.
 
 ## 3. Performance Improvements
-*   **Algorithm Complexity:** Insertion sort has a time complexity of O(n^2). This is acceptable for small datasets, but for larger datasets, consider implementing O(n log n) algorithms like QuickSort or MergeSort.
-*   **In-place Sorting:** The current implementation correctly performs the sort in-place, which is memory efficient (O(1) space complexity).
+- **Generics:** The current implementation only supports `int[]`. To make it reusable and adhere to DRY (Don't Repeat Yourself) principles, the method should be refactored to use Generics (`T[]`) with a constraint on `IComparable<T>`.
+- **Algorithm Complexity:** Insertion sort has a time complexity of O(n²), which is acceptable for small datasets but inefficient for large arrays. Consider documenting the limitations of this algorithm or providing alternative sorting strategies (like QuickSort or MergeSort) for larger datasets.
 
 ## 4. Code Readability and Maintainability
-*   **Documentation:** The code lacks XML documentation comments. Adding `<summary>` tags would improve maintainability and IDE intellisense support.
+- **Separation of Concerns:** The `Main` method handles both data initialization and output. It is better to separate the test harness from the logic.
+- **Documentation:** The code lacks XML documentation comments. Adding `/// <summary>` tags would improve IDE intellisense and maintainability.
 
-## Suggested Improvements
-1. **Add Null Check:**
-   ```csharp
-   if (arr == null) throw new ArgumentNullException(nameof(arr));
-   ```
-2. **Use Generics:**
-   ```csharp
-   public static void InsertionSort<T>(T[] arr) where T : IComparable<T>
-   {
-       // Implementation using arr[j].CompareTo(key) > 0
-   }
-   ```
-3. **Move to a Utility Class:** Separate the sorting logic from the entry point.
+## Suggested Refactored Code Snippet:
+```csharp
+public static class SortingUtility
+{
+    /// <summary>
+    /// Sorts an array using the Insertion Sort algorithm.
+    /// </summary>
+    public static void InsertionSort<T>(T[] arr) where T : IComparable<T>
+    {
+        if (arr == null) throw new ArgumentNullException(nameof(arr));
+        
+        for (int i = 1; i < arr.Length; i++)
+        {
+            T key = arr[i];
+            int j = i - 1;
 
----
-**Status:** Review complete. Suggestions provided for modularity and robustness.
+            while (j >= 0 && arr[j].CompareTo(key) > 0)
+            {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+}
+```
