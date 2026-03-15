@@ -142,4 +142,66 @@ namespace SortingLibrary
 }
 ```
 
-**Summary:** The current implementation is a basic academic example. To move towards professional standards, implement Generics, add null checks, and move logic into a dedicated service class.
+**Summary:** The current implementation is a basic academic example. To move towards professional standards, implement Generics, add null checks, and move logic into a dedicated service class.# Code Review: InsertionSort.cs
+
+**Date and Time:** 2023-10-27 10:00:00 UTC
+**Owner:** Senior Developer
+
+---
+
+## 1. Overview
+The provided code implements the Insertion Sort algorithm in C#. While the implementation is functionally correct for basic scenarios, it lacks modern C# practices, modularity, and error handling required for production-level code.
+
+## 2. Code Quality and Best Practices
+*   **Encapsulation:** The algorithm is currently a static method within a `Program` class. It should be moved to a dedicated service or utility class (e.g., `SortingService`) to adhere to the Single Responsibility Principle.
+*   **Namespace Usage:** The code lacks a namespace. Always wrap your code in a namespace to avoid naming conflicts.
+*   **Generics:** The current implementation only supports `int[]`. To make this reusable and follow SOLID principles (Open/Closed Principle), it should be refactored to use Generics (`T`) and `IComparable<T>`.
+
+## 3. Potential Bugs and Security Issues
+*   **Null Reference Exception:** The `InsertionSort` method does not check if the input array `arr` is null. Calling `arr.Length` on a null array will throw a `NullReferenceException`.
+*   **Input Validation:** There is no validation for empty arrays, though the current logic handles them gracefully.
+
+## 4. Performance Improvements
+*   **Complexity:** Insertion Sort has a time complexity of O(n²), which is expected for this algorithm. However, for large datasets, this should be replaced with more efficient algorithms like Quicksort or Mergesort (O(n log n)).
+*   **Memory:** The algorithm sorts in-place, which is memory efficient (O(1) space complexity).
+
+## 5. Code Readability and Maintainability
+*   **Documentation:** The code lacks XML documentation comments (`///`). Adding these would improve developer experience when using IntelliSense.
+*   **Naming:** The naming is clear and follows standard conventions.
+
+---
+
+## Suggested Refactoring
+
+```csharp
+namespace SortingLibrary
+{
+    public static class SortingUtility
+    {
+        /// <summary>
+        /// Performs an in-place insertion sort on an array of comparable items.
+        /// </summary>
+        public static void InsertionSort<T>(T[] array) where T : IComparable<T>
+        {
+            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (array.Length <= 1) return;
+
+            for (int i = 1; i < array.Length; i++)
+            {
+                T key = array[i];
+                int j = i - 1;
+
+                while (j >= 0 && array[j].CompareTo(key) > 0)
+                {
+                    array[j + 1] = array[j];
+                    j--;
+                }
+                array[j + 1] = key;
+            }
+        }
+    }
+}
+```
+
+---
+**Status:** Review completed. Please refactor based on the suggestions above.
