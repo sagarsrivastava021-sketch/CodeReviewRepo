@@ -25,4 +25,61 @@
 2. Add null-check validation for the input array.
 3. Refactor to a generic implementation to support various data types.
 4. Move the algorithm to a dedicated service/utility class.
-5. Add XML documentation for the method.
+5. Add XML documentation for the method.# Code Review: InsertionSort.cs
+
+**Date and Time:** 2023-10-27 10:00 AM
+**Owner:** Senior Developer (Code Reviewer)
+
+---
+
+## 1. Overview
+The provided code implements the Insertion Sort algorithm in C#. While the core logic is functionally correct, there are several areas where the code can be improved to align with professional .NET standards, SOLID principles, and maintainability.
+
+## 2. Code Quality and Best Practices
+*   **Encapsulation:** The `InsertionSort` method is currently static and located within the `Program` class. In a real-world application, sorting algorithms should be encapsulated in a dedicated utility class or service (e.g., `SortingService`) to promote modularity and reusability.
+*   **Generics:** The implementation is hardcoded for `int[]`. To follow SOLID principles (specifically the Open/Closed Principle), this should be refactored to use Generics (`T`) and `IComparable<T>` to support any data type that can be ordered.
+*   **Namespace Usage:** The code lacks a namespace. Always wrap your classes in a namespace to avoid naming collisions.
+
+## 3. Potential Bugs or Security Issues
+*   **Null Reference Exception:** The method does not check if the input array `arr` is null. Passing a null array will result in a `NullReferenceException`.
+*   **Empty Array Handling:** While the loop logic handles empty arrays correctly, it is defensive programming practice to validate input at the start of the method.
+
+## 4. Performance Improvements
+*   **Complexity:** Insertion sort has a time complexity of O(n²). While acceptable for small datasets, it is inefficient for large collections. For production code, consider using built-in methods like `Array.Sort()` (which uses Introspective Sort) unless there is a specific requirement for Insertion Sort.
+
+## 5. Code Readability and Maintainability
+*   **Documentation:** The code lacks XML documentation comments. Adding `/// <summary>` tags would help other developers understand the purpose and parameters of the method.
+*   **Naming Conventions:** The naming is generally fine, but the structure could be improved by separating the algorithm logic from the entry point (`Main` method).
+
+---
+
+## Suggested Refactoring
+```csharp
+namespace SortingAlgorithms
+{
+    public static class SortUtility
+    {
+        /// <summary>
+        /// Performs an insertion sort on the provided array.
+        /// </summary>
+        public static void InsertionSort<T>(T[] arr) where T : IComparable<T>
+        {
+            if (arr == null) throw new ArgumentNullException(nameof(arr));
+            if (arr.Length <= 1) return;
+
+            for (int i = 1; i < arr.Length; i++)
+            {
+                T key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j].CompareTo(key) > 0)
+                {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+        }
+    }
+}
+```
