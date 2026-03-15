@@ -316,4 +316,56 @@ namespace SortingAlgorithms
         }
     }
 }
+```# Code Review: InsertionSort.cs
+**Date and Time:** 2023-10-27 10:00:00 UTC
+**Owner:** sagarsrivastava021-sketch
+
+---
+
+## 1. Code Quality and Best Practices
+*   **Namespace Usage:** The code is written in the global namespace. For better organization and to avoid naming conflicts, it should be wrapped in a proper namespace (e.g., `SortingAlgorithms`).
+*   **Encapsulation:** The `InsertionSort` method is currently inside a `Program` class. It should be moved to a utility class (e.g., `SortUtility`) to follow the Single Responsibility Principle, allowing it to be reused across the application.
+*   **Visibility:** The method should be explicitly marked as `public` if it is intended to be used by other parts of the system.
+
+## 2. Potential Bugs or Security Issues
+*   **Null Reference Exception:** The `InsertionSort` method does not check if the input array `arr` is null. Calling this method with a null array will throw a `NullReferenceException`.
+*   **Input Validation:** While the algorithm works for integers, it is not robust against empty arrays (though the loop handles it correctly by not executing). Adding a guard clause is recommended.
+
+## 3. Performance Improvements
+*   **Generics:** The current implementation is hardcoded for `int[]`. To make this more versatile and follow DRY (Don't Repeat Yourself) principles, consider using Generics (`T[]`) with a constraint of `where T : IComparable<T>`. This would allow the sort to work for any comparable type (strings, custom objects, etc.) without duplicating code.
+
+## 4. Code Readability and Maintainability
+*   **Documentation:** The method lacks XML documentation comments. Adding `<summary>` tags would help other developers understand the purpose, parameters, and complexity of the algorithm.
+*   **Naming:** The variable names (`arr`, `i`, `j`, `key`) are standard for this algorithm, which is acceptable, but adding a brief comment explaining the logic inside the `while` loop would improve maintainability for junior developers.
+
+---
+
+### Suggested Refactoring:
+```csharp
+namespace SortingAlgorithms
+{
+    public static class SortUtility
+    {
+        /// <summary>
+        /// Performs an insertion sort on the provided array.
+        /// </summary>
+        public static void InsertionSort<T>(T[] arr) where T : IComparable<T>
+        {
+            if (arr == null) throw new ArgumentNullException(nameof(arr));
+            
+            for (int i = 1; i < arr.Length; i++)
+            {
+                T key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j].CompareTo(key) > 0)
+                {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+        }
+    }
+}
 ```
