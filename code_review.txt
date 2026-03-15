@@ -89,3 +89,54 @@ public static class SortingUtility
     }
 }
 ```
+# Code Review Report: InsertionSort.cs
+
+**Date:** 2023-10-27 10:00 AM
+**Owner:** Senior .NET Developer
+
+## 1. Code Quality and Best Practices
+- **Encapsulation:** The `InsertionSort` method is currently inside a `Program` class. For better maintainability and modularity, this should be moved to a dedicated utility class (e.g., `SortingAlgorithms`) to adhere to the Single Responsibility Principle (SOLID).
+- **Naming Conventions:** The method name `InsertionSort` is appropriate. However, the parameter `arr` could be more descriptive (e.g., `array`).
+- **Access Modifiers:** The method is implicitly `private`. If this is intended to be a reusable utility, it should be `public` and placed in a library project.
+
+## 2. Potential Bugs or Security Issues
+- **Input Validation:** The code lacks null checks. If a null array is passed to `InsertionSort`, it will throw a `NullReferenceException`. 
+- **Integer Overflow:** While not directly applicable to this specific sorting logic, always consider input bounds when dealing with array indices.
+
+## 3. Performance Improvements
+- **Generics:** The current implementation only supports `int[]`. To make this production-ready and reusable, use C# Generics with a constraint of `where T : IComparable<T>`. This would allow the method to sort any comparable type (string, double, custom objects, etc.).
+- **Algorithm Choice:** Insertion sort has a time complexity of O(n^2). While acceptable for small datasets, it is inefficient for large arrays. Consider recommending QuickSort or MergeSort for larger datasets.
+
+## 4. Readability and Maintainability
+- **Documentation:** The code lacks XML documentation comments (`///`). Adding these would improve IntelliSense support and maintainability for other team members.
+- **Modularity:** Moving the sorting logic to a separate class/namespace would improve the structure of the project.
+
+## Suggested Refactoring
+```csharp
+public static class SortingUtility
+{
+    /// <summary>
+    /// Sorts an array using the Insertion Sort algorithm.
+    /// </summary>
+    public static void InsertionSort<T>(T[] array) where T : IComparable<T>
+    {
+        if (array == null) throw new ArgumentNullException(nameof(array));
+
+        for (int i = 1; i < array.Length; i++)
+        {
+            T key = array[i];
+            int j = i - 1;
+
+            while (j >= 0 && array[j].CompareTo(key) > 0)
+            {
+                array[j + 1] = array[j];
+                j--;
+            }
+            array[j + 1] = key;
+        }
+    }
+}
+```
+
+## Summary
+The current implementation is a functional basic example but lacks the robustness required for a professional .NET application. Implementing generics and adding defensive programming (null checks) are the highest priority improvements.
