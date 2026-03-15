@@ -193,3 +193,68 @@ namespace SortingAlgorithms.Core
     }
 }
 ```
+# Code Review Report: InsertionSort.cs
+
+**Date and Time:** 2023-10-27 10:00 AM
+**Owner:** sagarsrivastava021-sketch
+
+---
+
+## 1. Overview
+The provided code implements the Insertion Sort algorithm in C#. While the core logic is functionally correct for the provided sample, it lacks modern C# practices, modularity, and robustness required for a production-grade application.
+
+## 2. Code Quality and Best Practices
+*   **Encapsulation:** The `InsertionSort` method is currently inside a `Program` class. It should be moved to a dedicated `SortingUtility` or `Algorithms` class to follow the Single Responsibility Principle (SRP).
+*   **Access Modifiers:** The method should be explicitly marked as `public` if it is intended to be used by other parts of the application.
+*   **Namespace:** The code lacks a namespace declaration. Always wrap code in a namespace to avoid naming conflicts.
+
+## 3. Potential Bugs and Security Issues
+*   **Null Reference Exception:** The code does not check if the input array `arr` is null. Calling `arr.Length` on a null array will throw a `NullReferenceException`.
+*   **Input Validation:** The code assumes the array is of type `int[]`. Consider using Generics (`T[]`) with a constraint (`where T : IComparable<T>`) to make the sorting utility reusable for other comparable types.
+
+## 4. Performance Improvements
+*   **Time Complexity:** Insertion Sort has a time complexity of O(n²), which is acceptable for small datasets but inefficient for large arrays. For larger datasets, consider implementing QuickSort or MergeSort.
+*   **Memory:** The algorithm is in-place, which is good for memory efficiency (O(1) auxiliary space).
+
+## 5. Code Readability and Maintainability
+*   **Documentation:** Add XML documentation comments (`///`) to the method to explain parameters and behavior.
+*   **Naming:** The naming is clear, but the structure is too monolithic.
+
+---
+
+## Suggested Refactoring
+
+```csharp
+namespace SortingAlgorithms
+{
+    public static class SortingUtility
+    {
+        /// <summary>
+        /// Sorts an array of integers using the Insertion Sort algorithm.
+        /// </summary>
+        /// <param name="arr">The array to sort.</param>
+        public static void InsertionSort(int[] arr)
+        {
+            if (arr == null) throw new ArgumentNullException(nameof(arr));
+            if (arr.Length <= 1) return;
+
+            for (int i = 1; i < arr.Length; i++)
+            {
+                int key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j] > key)
+                {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+
+                arr[j + 1] = key;
+            }
+        }
+    }
+}
+```
+
+---
+**Status:** Review complete. Please address the null check and architectural concerns before merging.
