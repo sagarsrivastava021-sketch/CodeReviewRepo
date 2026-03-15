@@ -83,3 +83,63 @@ namespace SortingAlgorithms
     }
 }
 ```
+# Code Review: InsertionSort.cs
+
+**Date and Time:** 2023-10-27 10:00:00 UTC
+**Owner:** Senior Developer
+
+---
+
+## 1. Overview
+The provided code implements the Insertion Sort algorithm in C#. While the implementation is functionally correct for the provided example, it lacks modern C# best practices, modularity, and robustness required for a production-grade application.
+
+## 2. Code Quality and Best Practices
+*   **Encapsulation:** The `InsertionSort` method and the `Main` method are inside a static `Program` class. In a real-world project, sorting algorithms should be extracted into a dedicated service or utility class (e.g., `SortingService`) to adhere to the Single Responsibility Principle (SRP).
+*   **Generics:** The current implementation only supports `int[]`. To make this utility reusable, it should use Generics (`T[]`) and implement `IComparable<T>` to allow sorting of any comparable data type.
+*   **Namespace:** The code lacks a namespace definition, which is a standard requirement for organizing code in .NET projects.
+
+## 3. Potential Bugs and Security Issues
+*   **Null Reference Exception:** There is no check to see if the input array `arr` is null. Passing a null array will cause a `NullReferenceException` at `arr.Length`.
+*   **Input Validation:** The code assumes valid input. Adding defensive programming checks is recommended.
+
+## 4. Performance Improvements
+*   **Algorithm Choice:** Insertion Sort has a time complexity of O(n²). While acceptable for small datasets or nearly sorted arrays, it is inefficient for large datasets. For production, consider using built-in methods like `Array.Sort()` (which uses Introsort) or implementing QuickSort/MergeSort for better performance (O(n log n)).
+
+## 5. Code Readability and Maintainability
+*   **Documentation:** The code lacks XML documentation comments (`/// <summary>`) which are essential for IntelliSense and maintainability.
+*   **Naming:** The naming is clear, but the structure is too tightly coupled.
+
+---
+
+## Suggested Refactored Approach
+
+```csharp
+namespace SortingLibrary
+{
+    public static class SortingUtility
+    {
+        /// <summary>
+        /// Sorts an array using the Insertion Sort algorithm.
+        /// </summary>
+        public static void InsertionSort<T>(T[] array) where T : IComparable<T>
+        {
+            if (array == null) throw new ArgumentNullException(nameof(array));
+
+            for (int i = 1; i < array.Length; i++)
+            {
+                T key = array[i];
+                int j = i - 1;
+
+                while (j >= 0 && array[j].CompareTo(key) > 0)
+                {
+                    array[j + 1] = array[j];
+                    j--;
+                }
+                array[j + 1] = key;
+            }
+        }
+    }
+}
+```
+
+**Summary:** The current implementation is a basic academic example. To move towards professional standards, implement Generics, add null checks, and move logic into a dedicated service class.
