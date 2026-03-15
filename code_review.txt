@@ -39,4 +39,53 @@ public static class SortingUtility
         }
     }
 }
+```# Code Review: InsertionSort.cs
+
+## 1. Code Quality and Best Practices
+- **Encapsulation:** The `InsertionSort` method is currently inside a `Program` class. For better reusability and modularity, this should be moved to a dedicated `SortingUtility` or `Algorithms` class.
+- **Generics:** The current implementation only supports `int[]`. To follow SOLID principles (Open/Closed Principle), the method should be refactored to use generics (`T[]`) where `T` implements `IComparable<T>`. This would allow the algorithm to sort any comparable data type.
+- **Naming:** Method and variable names are clear and follow standard conventions.
+
+## 2. Potential Bugs or Security Issues
+- **Input Validation:** There is no check for `null` or empty arrays. Passing a `null` array will result in a `NullReferenceException`.
+- **Security:** No specific security vulnerabilities identified for this algorithmic implementation.
+
+## 3. Performance Improvements
+- **Time Complexity:** The algorithm correctly implements Insertion Sort with $O(n^2)$ time complexity.
+- **Space Complexity:** It is an in-place sorting algorithm with $O(1)$ auxiliary space, which is optimal for this algorithm.
+- **Micro-optimizations:** For very large arrays, consider using `Array.Sort()` (which uses Introspective Sort) as it is highly optimized and generally faster ($O(n \log n)$).
+
+## 4. Code Readability and Maintainability
+- **Documentation:** The code lacks XML documentation comments. Adding `<summary>` tags would improve maintainability and IDE intellisense.
+- **Separation of Concerns:** The logic for sorting and the console output are tightly coupled in the `Program` class. Consider separating the algorithm logic from the entry point.
+
+## Suggested Refactored Code Example:
+
+```csharp
+using System;
+
+public static class SortingUtility
+{
+    /// <summary>
+    /// Performs an in-place insertion sort on the provided array.
+    /// </summary>
+    public static void InsertionSort<T>(T[] array) where T : IComparable<T>
+    {
+        if (array == null) throw new ArgumentNullException(nameof(array));
+        if (array.Length <= 1) return;
+
+        for (int i = 1; i < array.Length; i++)
+        {
+            T key = array[i];
+            int j = i - 1;
+
+            while (j >= 0 && array[j].CompareTo(key) > 0)
+            {
+                array[j + 1] = array[j];
+                j--;
+            }
+            array[j + 1] = key;
+        }
+    }
+}
 ```
